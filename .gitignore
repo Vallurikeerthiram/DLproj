@@ -28,9 +28,9 @@ wheels/
 *.ipynb
 
 # Data files (can be large)
-*.xlsx
-*.xls
-*.csv
+# *.xlsx - Commented out to allow sample data
+# *.xls
+# *.csv
 
 # IDEs
 .vscode/

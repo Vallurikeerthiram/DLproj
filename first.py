@@ -42,11 +42,19 @@ y = df[target_col]
 
 # Handle non-numeric columns
 for col in X.columns:
-    if X[col].dtype == 'object':
+    if X[col].dtype == 'object' or 'datetime' in str(X[col].dtype):
         try:
             X[col] = pd.to_datetime(X[col]).astype(int) / 10**9
         except:
             X = pd.get_dummies(X, columns=[col], drop_first=True)
+    elif 'datetime' in str(X[col].dtype):
+        X[col] = X[col].astype(int) / 10**9
+
+# Drop any remaining datetime columns
+datetime_cols = X.select_dtypes(include=['datetime64']).columns
+if len(datetime_cols) > 0:
+    print(f"Dropping datetime columns: {list(datetime_cols)}")
+    X = X.drop(columns=datetime_cols)
 
 # Train-test split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)

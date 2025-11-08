@@ -110,12 +110,20 @@ class WaterIntakePredictor:
         
         # Convert non-numeric columns to numeric if needed
         for col in X.columns:
-            if X[col].dtype == 'object':
+            if X[col].dtype == 'object' or 'datetime' in str(X[col].dtype):
                 try:
                     X[col] = pd.to_datetime(X[col]).astype(int) / 10**9  # Convert to timestamp
                 except:
                     # Try one-hot encoding for categorical
                     X = pd.get_dummies(X, columns=[col], drop_first=True)
+            elif 'datetime' in str(X[col].dtype):
+                X[col] = X[col].astype(int) / 10**9
+        
+        # Drop any remaining datetime columns that couldn't be converted
+        datetime_cols = X.select_dtypes(include=['datetime64']).columns
+        if len(datetime_cols) > 0:
+            print(f"  Dropping unconverted datetime columns: {list(datetime_cols)}")
+            X = X.drop(columns=datetime_cols)
         
         print(f"✓ Features shape: {X.shape}")
         print(f"✓ Target shape: {y.shape}")
